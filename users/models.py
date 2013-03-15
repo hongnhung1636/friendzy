@@ -47,11 +47,11 @@ class User(models.Model):
         return myuser.get_friend_statuses()
     
     def get_friend_statuses(self):
-        statuses = []
+        statuses = {}
         for friend in self.friends:
             try:
                 myuser = User.objects.get(facebook_id=userid)
-                statuses += [myuser.facebook_id, myuser.get_status()]
+                statuses[myuser.facebook_id] = myuser.get_status()
             except User.DoesNotExist:
                 #do nothing
                 print("user " + str(self.facebook_id) + " needs to relogin to update friendlist")
