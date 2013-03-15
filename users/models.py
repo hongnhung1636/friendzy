@@ -36,37 +36,51 @@ class User(models.Model):
     status = models.CharField(max_length=200)
     status_time = models.DateTimeField('date published')
     
-    def login(self, userid, facebook_friends):
+    @classmethod
+    def login(cls, userid, facebook_friends):
         try:
             myuser = User.objects.get(facebook_id=userid)
         except User.DoesNotExist:
             myuser = User()
-            myuser.save()
+            myuser.status_time = datetime.datetime.now() - datetime.timedelta(minutes=16)
         #user exists
         myuser.friends = facebook_friends
-        return myuser.get_friend_statuses()
+        myuser.save()
+        return {"data":myuser.get_friend_statuses()}
     
     def get_friend_statuses(self):
         statuses = {}
-        for friend in self.friends:
+        for friendid in self.friends:
             try:
-                myuser = User.objects.get(facebook_id=userid)
-                statuses[myuser.facebook_id] = myuser.get_status()
+                userid = friendid
+                myuser = User.objects.filter(facebook_id=userid)
+                if len(myuser)>0:
+                    myuser = myuser[0] # crappy filtering - can change to .get instead of .filter later
+                if len(myuser)!= 0 and myuser.get_status() != None:
+                    statuses[myuser.facebook_id] = myuser.get_status()
             except User.DoesNotExist:
                 #do nothing
                 print("user " + str(self.facebook_id) + " needs to relogin to update friendlist")
-        return filter(lambda x: x[1] != None, statuses)
+        return statuses
     
-    def set_status(self, userid, status, time):
-        self.status = status
-        status_time = self.parse_date(time)
+    @classmethod
+    def set_status(cls, userid, status, time):
+        curuser=None
+        try:
+            curuser = User.objects.get(facebook_id=userid)
+        except User.DoesNotExist:
+            curuser = User()
+            curuser.status_time = datetime.datetime.now() - datetime.timedelta(minutes=16)
+        #user exists
+        curuser.status = status
+        status_time = curuser.parse_date(time)
         try:
             myuser = User.objects.get(facebook_id=userid)
             # return matching statuses
             statuses = myuser.get_friend_statuses()
             out = []
             for fid, fstatus in statuses:
-                if self.matches(status, fstatus):
+                if curuser.matches(status, fstatus):
                     out.append([status, fstatus])
             return out
         except User.DoesNotExist:
@@ -79,7 +93,8 @@ class User(models.Model):
         """
         now = datetime.datetime.now()
         statustime = self.status_time
-        if now-statustime < datetime.timedelta(minutes=-1):
+        naive = statustime.replace(tzinfo=None)
+        if now-naive < datetime.timedelta(minutes=15):
             return self.status
         return None
     
@@ -95,6 +110,9 @@ class User(models.Model):
     def parse_date(time):
         return time
     
+    @staticmethod
+    def TESTAPI_resetFixture():
+        User.objects.all().delete()
     
 
 
