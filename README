@@ -1,0 +1,4 @@
+Connects android users by using a status
+
+for login, use friendzy.herokuapp.com/login
+to set status, use friendzy.herokuapp.com/set_status
