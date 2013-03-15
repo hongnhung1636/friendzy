@@ -38,11 +38,14 @@ class User(models.Model):
     
     @classmethod
     def login(cls, userid, facebook_friends):
+        myuser = None
         try:
             myuser = User.objects.get(facebook_id=userid)
         except User.DoesNotExist:
             myuser = User()
             myuser.status_time = datetime.datetime.now() - datetime.timedelta(minutes=16)
+            myuser.facebook_id = userid
+            myuser.save()
         #user exists
         myuser.friends = facebook_friends
         myuser.save()
@@ -79,9 +82,9 @@ class User(models.Model):
             # return matching statuses
             statuses = myuser.get_friend_statuses()
             out = []
-            for fid, fstatus in statuses:
-                if curuser.matches(status, fstatus):
-                    out.append([status, fstatus])
+            for key in statuses:
+                if curuser.matches(status, status[key]):
+                    out.append([status, status[key]])
             return out
         except User.DoesNotExist:
             #do nothing
