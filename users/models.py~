@@ -57,9 +57,9 @@ class User(models.Model):
             try:
                 userid = friendid
                 myuser = User.objects.filter(facebook_id=userid)
-                if len(myuser)>0:
+                if len(myuser) > 0:
                     myuser = myuser[0] # crappy filtering - can change to .get instead of .filter later
-                if len(myuser)!= 0 and myuser.get_status() != None:
+                if myuser.get_status() != None:
                     statuses[myuser.facebook_id] = myuser.get_status()
             except User.DoesNotExist:
                 #do nothing

@@ -2,8 +2,8 @@ import json
 import urllib2
 
 data = json.dumps({"userID":"1234test", "facebookFriends":['f1','f2','f3','f4']})
-#url = "http://friendzy.herokuapp.com/login"
-burl = "http://127.0.0.1:8000"
+burl = "http://friendzy.herokuapp.com/login"
+#burl = "http://127.0.0.1:8000"
 url = burl + '/login'
 req = urllib2.Request(url, data, {'Content-Type': 'application/json'})
 response=None
