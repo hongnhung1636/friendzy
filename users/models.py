@@ -59,9 +59,12 @@ class User(models.Model):
                 myuser = User.objects.filter(facebook_id=userid)
                 if len(myuser) > 0:
                     myuser = myuser[0] # crappy filtering - can change to .get instead of .filter later
-                if myuser.get_status() != None:
+                else:
+                    print("friend " + str(userid) + " not found in friendzy database!")
+                    break
+                if and myuser.get_status() != None:
                     statuses[myuser.facebook_id] = myuser.get_status()
-            except User.DoesNotExist:
+            except User.DoesNotExist: #this except clause is only used when .filter is changed to .get
                 #do nothing
                 print("user " + str(self.facebook_id) + " needs to relogin to update friendlist")
         return statuses
