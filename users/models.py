@@ -62,7 +62,7 @@ class User(models.Model):
                 else:
                     print("friend " + str(userid) + " not found in friendzy database!")
                     break
-                if and myuser.get_status() != None:
+                if myuser.get_status() != None:
                     statuses[myuser.facebook_id] = myuser.get_status()
             except User.DoesNotExist: #this except clause is only used when .filter is changed to .get
                 #do nothing
